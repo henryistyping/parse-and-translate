@@ -1,0 +1,6 @@
+{
+  "python.analysis.extraPaths": [
+    "./dev/mainscreen",
+    "./dev/main_screen"
+  ]
+}
