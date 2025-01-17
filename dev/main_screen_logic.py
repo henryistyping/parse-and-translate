@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QWidget, QFileDialog, QMainWindow, QTableWidgetItem
+from PySide6.QtWidgets import QFileDialog, QMainWindow, QTableWidgetItem, QHeaderView
 from main_screen_ui import Ui_MainWindow
 
 
@@ -8,22 +8,31 @@ class MainScreen(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle("Super Localizer")
-        self.actionOpen.triggered.connect(
-            self.browseFiles
-        )  #://FIXME ask to save the current file bofore opening dialog window.
+        self.actionOpen.triggered.connect(self.browseFiles)
+        #://TODO ask to save the current file bofore opening dialog window.
+        self.setupTable()
 
     def do_something(self):
         print("Hello, World!")
+
+    def setupTable(self):
+        # stretch the headers out
+        header = self.mainTableWidget.horizontalHeader()
+        header.setSectionResizeMode(0, QHeaderView.Stretch)
+        header.setSectionResizeMode(1, QHeaderView.Stretch)
+        header.setSectionResizeMode(2, QHeaderView.Stretch)
 
     def browseFiles(self):
         fileName = QFileDialog.getOpenFileName(
             self, "Open File", "", "All Files (*);;Text Files (*.txt)"
         )
 
-        while self.mainTableWidget.rowCount() > 0:
-            self.mainTableWidget.removeRow(0)
-
         if fileName[0]:
+            # clear the table
+            while self.mainTableWidget.rowCount() > 0:
+                self.mainTableWidget.removeRow(0)
+
+            # read the content of the file
             f = open(fileName[0], "r")
 
             with f:
@@ -38,12 +47,22 @@ class MainScreen(QMainWindow, Ui_MainWindow):
         for row, line in enumerate(lines):
             text = line.strip()  # strip of any leading or trailing whitespaces
 
-            # Set the first column (non-editable)
-            item_original = QTableWidgetItem(text)
-            item_original.setFlags(item_original.flags() & ~Qt.ItemIsEditable)
-            self.mainTableWidget.setItem(row, 0, item_original)
+            # Set both columns up
+            self._setTableItem(row, 0, text, editable=False)
+            self._setTableItem(row, 1, text, editable=True)
 
-            # Set the second column (editable)
-            item_editable = QTableWidgetItem(text)
-            item_editable.setFlags(item_editable.flags() | Qt.ItemIsEditable)
-            self.mainTableWidget.setItem(row, 1, item_editable)
+    def _setTableItem(self, row, column, text, editable=False):
+        # Set a specific item in the table
+        item = QTableWidgetItem(text)
+        flags = item.flags()
+
+        if not editable:
+            item.setFlags(flags & ~Qt.ItemIsEditable)
+        else:
+            item.setFlags(flags | Qt.ItemIsEditable)
+
+        self.mainTableWidget.setItem(row, column, item)
+        
+        # Make the words wrap around in the cell
+        self.mainTableWidget.setWordWrap(True)
+        self.mainTableWidget.resizeRowsToContents()
