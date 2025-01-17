@@ -27,14 +27,23 @@ class MainScreen(QMainWindow, Ui_MainWindow):
             f = open(fileName[0], "r")
 
             with f:
-                data = f.readlines()
-                self.populateTable(data)
+                lines = f.readlines()
+            self.populateTable(lines)
 
-    def populateTable(self, data):
-        n = self.mainTableWidget.rowCount()
-        self.mainTableWidget.setRowCount(n + len(data))  # hardcoded for now
-        for i in data:
-            item = item2 = QTableWidgetItem()
-            self.mainTableWidget.setItem(n, 0, item)  # set source text
-            item.setText(i)
-            n = n + 1
+    def populateTable(self, lines):
+
+        # Ensure the table has enough rows for the data
+        self.mainTableWidget.setRowCount(len(lines))
+
+        for row, line in enumerate(lines):
+            text = line.strip()  # strip of any leading or trailing whitespaces
+
+            # Set the first column (non-editable)
+            item_original = QTableWidgetItem(text)
+            item_original.setFlags(item_original.flags() & ~Qt.ItemIsEditable)
+            self.mainTableWidget.setItem(row, 0, item_original)
+
+            # Set the second column (editable)
+            item_editable = QTableWidgetItem(text)
+            item_editable.setFlags(item_editable.flags() | Qt.ItemIsEditable)
+            self.mainTableWidget.setItem(row, 1, item_editable)
