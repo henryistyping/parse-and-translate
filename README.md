@@ -2,7 +2,7 @@
 
 A program specifically made for my translation project.
 
-Some features:
+Some features (to be implemented):
 
 - Opens a .txt file
 - Search for strings with specific parameters
