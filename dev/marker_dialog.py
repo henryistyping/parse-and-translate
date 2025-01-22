@@ -1,7 +1,6 @@
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QDialog
 
-from marker_filter_ui import Ui_Marker_filter
+from ui.marker_dialog_ui import Ui_Marker_filter
 
 class MarkerFilterDialog(QDialog, Ui_Marker_filter):
   def __init__(self, parent=None):

@@ -1,6 +1,9 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFileDialog, QMainWindow, QTableWidgetItem, QHeaderView
-from main_screen_ui import Ui_MainWindow
+
+# modules
+from ui.main_screen_ui import Ui_MainWindow
+from marker_dialog import MarkerFilterDialog
 
 class MainScreen(QMainWindow, Ui_MainWindow):
     # Steps when initlizing
@@ -53,7 +56,9 @@ class MainScreen(QMainWindow, Ui_MainWindow):
 
     def open_dialog_marker(self):
         # opens the dialog window for filtering marker
-        pass
+        dialog = MarkerFilterDialog(self)
+        dialog.exec()
+
         
         
 
