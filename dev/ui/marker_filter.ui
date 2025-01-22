@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>Marker_filter</class>
+ <widget class="QDialog" name="Marker_filter">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -141,7 +141,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>Marker_filter</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -157,7 +157,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>Marker_filter</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

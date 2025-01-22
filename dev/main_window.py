@@ -2,7 +2,6 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFileDialog, QMainWindow, QTableWidgetItem, QHeaderView
 from main_screen_ui import Ui_MainWindow
 
-
 class MainScreen(QMainWindow, Ui_MainWindow):
     # Steps when initlizing
     def __init__(self):
@@ -43,10 +42,20 @@ class MainScreen(QMainWindow, Ui_MainWindow):
 
             # TODO: ask if user wants to filter for any markers in the strings
             # STRETCH: allow options for multiple markers
+            # STRETCH: hold the markers in memory, so that they're not lost even if you choose radio choice: no
+            
+            # open the dialog window
+            self.open_dialog_marker()
 
             with f:
                 lines = f.readlines()
             self._populateTable(lines)
+
+    def open_dialog_marker(self):
+        # opens the dialog window for filtering marker
+        pass
+        
+        
 
     def _populateTable(self, lines):
 
