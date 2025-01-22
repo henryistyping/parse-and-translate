@@ -4,13 +4,19 @@ from main_screen_ui import Ui_MainWindow
 
 
 class MainScreen(QMainWindow, Ui_MainWindow):
+    # Steps when initlizing
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle("Super Localizer")
+        
+        # Action Resize table
+        self.setupTable()
+        
+        # Action open file
         self.actionOpen.triggered.connect(self.browseFiles)
         #://TODO ask to save the current file bofore opening dialog window.
-        self.setupTable()
+        
 
     def do_something(self):
         print("Hello, World!")
@@ -35,11 +41,14 @@ class MainScreen(QMainWindow, Ui_MainWindow):
             # read the content of the file
             f = open(fileName[0], "r")
 
+            # TODO: ask if user wants to filter for any markers in the strings
+            # STRETCH: allow options for multiple markers
+
             with f:
                 lines = f.readlines()
-            self.populateTable(lines)
+            self._populateTable(lines)
 
-    def populateTable(self, lines):
+    def _populateTable(self, lines):
 
         # Ensure the table has enough rows for the data
         self.mainTableWidget.setRowCount(len(lines))
