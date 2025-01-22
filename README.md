@@ -4,8 +4,8 @@ A program specifically made for my translation project.
 
 Some features (to be implemented):
 
-- Opens a .txt file
-- Search for strings with specific parameters
+- Opens a .txt file (or anything that contains strings)
+- Search for strings using specific parameters (text markers for now)
 
 e.g.
 
