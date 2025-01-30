@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'main_screen.ui'
+## Form generated from reading UI file 'main_screenFepFhC.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.1
 ##
@@ -31,6 +31,8 @@ class Ui_MainWindow(object):
         self.actionExit.setObjectName(u"actionExit")
         self.actionSave = QAction(MainWindow)
         self.actionSave.setObjectName(u"actionSave")
+        self.actionExport = QAction(MainWindow)
+        self.actionExport.setObjectName(u"actionExport")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setEnabled(True)
@@ -64,6 +66,8 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuEdit.menuAction())
         self.menuf.addAction(self.actionOpen)
         self.menuf.addAction(self.actionSave)
+        self.menuf.addAction(self.actionExport)
+        self.menuf.addSeparator()
         self.menuf.addAction(self.actionExit)
 
         self.retranslateUi(MainWindow)
@@ -75,7 +79,8 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
         self.actionOpen.setText(QCoreApplication.translate("MainWindow", u"Open", None))
         self.actionExit.setText(QCoreApplication.translate("MainWindow", u"Exit", None))
-        self.actionSave.setText(QCoreApplication.translate("MainWindow", u"Save As...", None))
+        self.actionSave.setText(QCoreApplication.translate("MainWindow", u"Save Project", None))
+        self.actionExport.setText(QCoreApplication.translate("MainWindow", u"Export", None))
         ___qtablewidgetitem = self.mainTableWidget.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("MainWindow", u"Source Text", None));
         ___qtablewidgetitem1 = self.mainTableWidget.horizontalHeaderItem(1)
