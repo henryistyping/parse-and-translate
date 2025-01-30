@@ -1,5 +1,0 @@
-1. Grab all the lines from the txt file (or any compatible files)
-2. If user is filtering by marker, create a separate array with "line number" and "string value"
--- Make sure to handle indents for any type of codes.
-3. Display the new array in a table format
-4. After all edits are made, save the lines as a separate file, allowing overwriting files if the user chooses.
