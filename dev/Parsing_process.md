@@ -4,7 +4,7 @@
     1. [X] Original file is copied from and untouched
     2. [X] New project data is stored in memory (original text, translated text) in arry form called "project_data"
     3. [ ] Inherit current_project_path from the the project file we opened. If it's new, there is no path.
-    4. [ ] ?// Maybe ask the user if they want to move the source text file to a dedicated folder?
+    4. [ ] ?// Maybe ask the user if they want to move the source text file to a dedicated folder? - I think yes if I were to implement cloud saving option
 3. [ ] FIlter texts using regex, but still retain the original whitespaces and new lines
 
     1. [ ] Check Decision pending in `main_window.py`
