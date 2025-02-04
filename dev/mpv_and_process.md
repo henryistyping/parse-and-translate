@@ -17,7 +17,13 @@
 
     1. [X] Create new project file
     2. [X] Overwrite the project file it was opened from
-6. [ ] STRETCH: Give user an option to export
+6. [ ] Give user an option to export
 
     1. [ ] Create new exported file (txt, JSON; depending on the original source file format)
     2. [ ] Create .csv file of table comparison between original text v. translated text.
+7. [ ] BIG STRETCH: Give user option to save their work on cloud
+
+    1. [ ] Learn how to set up dockers  start here: https://www.reddit.com/r/webdev/comments/9oaq0l/im_a_complete_newbie_and_trying_to_set_up_a/
+    2. [ ] Set up: db to store the project files
+    3. [ ] Set up: O Auth for user specific encryption
+    4. [ ] Set up: REST API (front and back)
