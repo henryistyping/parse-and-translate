@@ -24,7 +24,7 @@ class MainScreen(QMainWindow, Ui_MainWindow):
         self.setWindowTitle("Super Localizer")
 
         # Action menu items
-        self.actionOpen.triggered.connect(self.browseFiles)
+        self.actionOpen.triggered.connect(self.openFile)
         self.actionSave.triggered.connect(self.saveProjectFile)
         self.actionExport.triggered.connect(self.exportFile)
 
@@ -62,57 +62,65 @@ class MainScreen(QMainWindow, Ui_MainWindow):
         6. Populate the table with the filtered lines 
     """
 
-    def browseFiles(self):
+    # TODO: Maybe separate the function into opening project file and opening source files? PROBABLY
+    def openFile(self):
         (
             fileName,
             _,
         ) = QFileDialog.getOpenFileName(  # Returns file path and filter string, but we're only interested in the file path
-            self, "Open File", "", "All Files (*);;Text Files (*.txt)"
+            self,
+            "Open File",
+            "",
+            "All Files (*);;Text Files (*.txt);;Project Files (*.trpj)",
         )
-
-        # if user doesn't select a file
-        if not fileName:
-            return
-
-        # save the source file path
-        self.original_file_path = fileName
 
         if fileName:
             # If user does select file, clear table
             while self.mainTableWidget.rowCount() > 0:
                 self.mainTableWidget.removeRow(0)
 
-            # read the content of the file
-            f = open(fileName, "r")
+            # if user opens the project file
+            if fileName.endswith(".trpj"):
+                lines = self.project_data = json.load(open(fileName, "r"))
 
-            # STRETCH 1: Filter for specific markers (beginning and end of string)
-            # STRETCH 2: allow multiple lines
-            # STRETCH 3: Remember the markers used
-            with f:
-                lines = f.readlines()  # turns lines into arrays
+            # if user opens a new text file
+            else:
+                # read the content of the file
+                f = open(fileName, "r")
 
-            # TODO: refactor this into a function
-            # Init and copy all source texts into project_data
-            self.project_data = [{"original": line, "translated": ""} for line in lines]
+                # STRETCH 1: Filter for specific markers (beginning and end of string)
+                # STRETCH 2: allow multiple lines
+                # STRETCH 3: Remember the markers used
+                with f:
+                    lines = f.readlines()  # turns lines into arrays
+
+                # TODO: refactor this into a function
+                # FIXME: build a better if statement for this
+                # Init and copy all source texts into project_data
+                self.project_data = [{"original": line, "translated": ""} for line in lines]
+
+                # TODO: refactor this into a function
+                # TODO: Decision pending - Decide whether to show this dialog window after user has select file or after the source texts have been set to table.
+                # Open dialog window to grab filter patterns
+                filter_dialog = FilterDialog(self)
+                if filter_dialog.exec():  # if user clicks ok
+                    if not filter_dialog.getRegexPattern() == ("", ""):
+                        # temp fix when use has no regex pattern set
+                        regex_pattern = filter_dialog.getRegexPattern()
+
+                        # sanity check
+                        print(regex_pattern)
+
+                        # start filtering the lines by regex pattern
+                        lines = self._filter_lines(lines, regex_pattern)
+
+            # save the source file path / ?: set project path
+            self.original_file_path = fileName
             self.current_project_path = None  # Reset the project path
-
-            # TODO: refactor this into a function
-            # TODO: Decision pending - Decide whether to show this dialog window after user has select file or after the source texts have been set to table.
-            # Open dialog window to grab filter patterns
-            filter_dialog = FilterDialog(self)
-            if filter_dialog.exec():  # if user clicks ok
-                if not filter_dialog.getRegexPattern() == ("", ""):
-                    # temp fix when use has no regex pattern set
-                    regex_pattern = filter_dialog.getRegexPattern()
-
-                    # sanity check
-                    print(regex_pattern)
-
-                    # start filtering the lines by regex pattern
-                    lines = self._filter_lines(lines, regex_pattern)
 
             # populate the table using the filtered lines
             self._populateTable(lines)
+            print(lines)
 
     def _filter_lines(self, lines, regex_pattern):
         # Filters the lines based on the regex pattern
@@ -123,10 +131,18 @@ class MainScreen(QMainWindow, Ui_MainWindow):
         # Ensure the table has enough rows for the data
         self.mainTableWidget.setRowCount(len(lines))
 
-        for row, line in enumerate(lines):
-            # Set both columns up
-            self._setTableItem(row, 0, line, editable=False)
-            self._setTableItem(row, 1, line, editable=True)
+        # If the project data was from previous project file
+        if self.project_data[0]["translated"] != "":
+            for index, item in enumerate(self.project_data):
+                self._setTableItem(index, 0, item["original"], editable=False)
+                self._setTableItem(index, 1, item["translated"], editable=True)
+        # If not
+        else:
+            for row, line in enumerate(lines):
+                # Set both columns up
+                self._setTableItem(row, 0, line, editable=False)
+                self._setTableItem(row, 1, line, editable=True)
+            
 
     def _setTableItem(self, row, column, text, editable=False):
         # Set a specific item in the table
@@ -144,6 +160,7 @@ class MainScreen(QMainWindow, Ui_MainWindow):
         Save current work as project file (original and translated text) as JSON file
         """
 
+    # Save project file under same name as before if it's from a previously made project file
     def saveProjectFile(self):
         # Check if there is any data
         # TODO: Disable save button if there's no data; delete the line 146
