@@ -9,10 +9,11 @@ from PySide6.QtWidgets import (
 import json
 import os
 import shutil
+import re
 
 # modules
-from ui.main_screen_ui import Ui_MainWindow
-from marker_dialog import FilterDialog
+from ui.ui_main_screen import Ui_MainWindow
+from filter_dialog import FilterDialog
 
 
 class MainScreen(QMainWindow, Ui_MainWindow):
@@ -36,7 +37,8 @@ class MainScreen(QMainWindow, Ui_MainWindow):
         self.original_file_path = None
 
         # Marker filter dialog
-        self.marker = None
+        self.marker_start = None
+        self.marker_end = None
 
     def setupTable(self):
         # stretch the headers out
@@ -51,49 +53,69 @@ class MainScreen(QMainWindow, Ui_MainWindow):
         )
 
     # STRETCH: Turn the file browsing section into its own class
+    """
+        1. Open a file using a FileDialog (explorer window)
+        2. Remember the source file path
+        3. Read the content of the file
+        4. Copy all of source texts as project_data
+        5. Start filtering the lines by regex pattern
+        6. Populate the table with the filtered lines 
+    """
+
     def browseFiles(self):
-        fileName, _ = (
-            QFileDialog.getOpenFileName(  # Returns file path and filter string, but we're only interested in the file path
-                self, "Open File", "", "All Files (*);;Text Files (*.txt)"
-            )
+        (
+            fileName,
+            _,
+        ) = QFileDialog.getOpenFileName(  # Returns file path and filter string, but we're only interested in the file path
+            self, "Open File", "", "All Files (*);;Text Files (*.txt)"
         )
 
         # if user doesn't select a file
         if not fileName:
             return
 
+        # save the source file path
         self.original_file_path = fileName
 
-        if fileName[0]:
-            # clear the table
+        if fileName:
+            # If user does select file, clear table
             while self.mainTableWidget.rowCount() > 0:
                 self.mainTableWidget.removeRow(0)
 
             # read the content of the file
-            f = open(fileName[0], "r")
+            f = open(fileName, "r")
 
-            # STRETCH: allow options for multiple markers
-
-            # opens the dialog window
+            # STRETCH 1: Filter for specific markers (beginning and end of string)
+            # STRETCH 2: allow multiple lines
+            # STRETCH 3: Remember the markers used
             with f:
                 lines = f.readlines()  # turns lines into arrays
 
-            # Open the dialog window to filter the lines
-            dialog = self.FilterDialog(self)
-            if dialog.exec():
-                regex_pattern = dialog.getRegexPattern()
-                lines = self._filter_lines(lines, regex_pattern)
-
-            self._populateTable(lines)
-
-            # Init project data
+            # TODO: refactor this into a function
+            # Init and copy all source texts into project_data
             self.project_data = [{"original": line, "translated": ""} for line in lines]
             self.current_project_path = None  # Reset the project path
 
+            # TODO: refactor this into a function
+            # TODO: Decision pending - Decide whether to show this dialog window after user has select file or after the source texts have been set to table.
+            # Open dialog window to grab filter patterns
+            filter_dialog = FilterDialog(self)
+            if filter_dialog.exec():  # if user clicks ok
+                if not filter_dialog.getRegexPattern() == ("", ""):
+                    # temp fix when use has no regex pattern set
+                    regex_pattern = filter_dialog.getRegexPattern()
+
+                    # sanity check
+                    print(regex_pattern)
+
+                    # start filtering the lines by regex pattern
+                    lines = self._filter_lines(lines, regex_pattern)
+
+            # populate the table using the filtered lines
+            self._populateTable(lines)
+
     def _filter_lines(self, lines, regex_pattern):
         # Filters the lines based on the regex pattern
-        import re
-
         return [line for line in lines if re.search(regex_pattern, line)]
 
     def _populateTable(self, lines):
@@ -118,20 +140,33 @@ class MainScreen(QMainWindow, Ui_MainWindow):
 
         self.mainTableWidget.setItem(row, column, item)
 
-    def saveProjectFile(self):
-        # Save current project dat (original and translated text) in JSON file
+        """
+        Save current work as project file (original and translated text) as JSON file
+        """
 
-        # Check if there is any data // normally Save option should be disabled if there is no data
+    def saveProjectFile(self):
+        # Check if there is any data
+        # TODO: Disable save button if there's no data; delete the line 146
         if not self.project_data:
             QMessageBox.warning(self, "Warning", "No data to save")
             return
 
         # Opens up a Explorer Dialog to save the file
-        file_name, _ = QFileDialog.getSaveFileName(
-            self, "Save Translated File", "", "Text Files (*.txt)"
+        # We ignore the filter string as _
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Proeject File",
+            "untitled.trpj",
+            "Translation Project (*.trpj);;All Files (*)",
         )
-        if not file_name:
+
+        # if user doesn't select a file
+        if not file_path:
             return
+
+        # Add .trpj to the file path
+        if not file_path.endswith(".trpj"):
+            file_path += ".trpj"
 
         # Collect traslated text from table
         for row in range(self.mainTableWidget.rowCount()):
@@ -139,10 +174,11 @@ class MainScreen(QMainWindow, Ui_MainWindow):
                 row, 1
             ).text()
 
-        with open(file_name, "w", encoding="utf-8") as f:
-            json.dump(self.project_data, f, indent=4, ensure_ascii=False)
+        # Save the file as JSON
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(self.project_data, f, ensure_ascii=False)
 
-        self.current_project_path = file_name
+        self.current_project_path = file_path
         QMessageBox.information(self, "Success", "File saved successfully")
         # STRETCH: Give user two options:
         # 1. Save project file as new
